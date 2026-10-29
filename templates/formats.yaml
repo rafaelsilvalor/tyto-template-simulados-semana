@@ -1,0 +1,4 @@
+# The sizes the example briefs render at. A pack brings templates and no formats: copy these
+# into the project that renders `simulados-semana`, or merge their lines into that project's own.
+grid: { w: 1080, h: 1350, kind: grid, label: Grid }
+story: { w: 1080, h: 1920, kind: story, label: Story }

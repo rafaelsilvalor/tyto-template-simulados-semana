@@ -1,0 +1,9 @@
+node_modules/
+# Renders made on a machine with the private brand kit carry the brand: never commit them.
+out/
+*.png
+*.svg
+.cache/
+coverage/
+# The reference art never enters this repository (it carries the brand and real copy).
+*.psd
