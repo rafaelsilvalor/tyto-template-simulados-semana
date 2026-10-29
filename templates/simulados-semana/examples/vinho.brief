@@ -1,0 +1,13 @@
+---
+template: simulados-semana
+formats: [grid, story]
+---
+// The shape of vinho's configuration: one day, one mock exam, one slide — so the
+// only grid is also the last, and it carries the call to comment.
+
+::titulo
+  Agenda de Simulados
+
+::lamina
+  Domingo 20/09 | Aplicação às 08h30 & correção às 14h
+  1º Simulado de 2ª Fase - Exame 47
