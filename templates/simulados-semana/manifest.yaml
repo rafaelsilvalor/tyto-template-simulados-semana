@@ -1,0 +1,34 @@
+name: simulados-semana
+version: 1.0.0
+# The look drawn when nothing configures it: ocre's, the brand the piece was first drawn for.
+# A plugin file's configuration picks roxo's or vinho's kit instead (Tyto ADR 0155), and the
+# accent, the logo and the signature come with that kit.
+brand: ocre
+description: The week's mock exams as a carousel and as stories — the title, then each day's schedule and its exams; the last grid asks for a comment.
+# Every face the composition measures, so the plugin's process can measure what Tyto measured
+# in-process for the built-ins (signature, exam, title and call, day and schedule).
+faces:
+  - { family: CircularXX, weight: 300 }
+  - { family: CircularXX, weight: 400 }
+  - { family: CircularXX, weight: 700 }
+  - { family: CircularXX, weight: 900 }
+# A configuration may render fewer: roxo's renders the story only (Tyto ADR 0155 decision 6).
+formats: [grid, story]
+slots:
+  # The title, drawn on every slide. A line break in the brief is a line break on the slide.
+  titulo: { type: rich-text, required: true, max: 60 }
+  # The words in the last grid's call to comment. Optional: without it the grid says
+  # "Escreva SIMULADO nos comentários para acessar". The default is in the code, since a
+  # manifest default only applies to an enum slot.
+  chamada: { type: rich-text, max: 60 }
+  # The seal art, 1080 × 140, glued to the foot of the last grid slide, never on a story.
+  # Optional; with it the page above shrinks by 140, so nothing is drawn under the seal. In
+  # the frontmatter: `selo: ./selo.png`.
+  selo: { type: image }
+  # A line drawn at the bottom instead of the brand's signature, such as a pointer to the
+  # story's link. Optional; roxo's configuration sets it on the brief's side.
+  nota: { type: rich-text, max: 60 }
+  # One slide each, cut by hand. Inside it, `Domingo 26/10 | Aplicação às 08h30 & correção
+  # às 14h` starts a day — the day, then its schedule on the accent band — and every line
+  # with no `|` under it is one of that day's mock exams. `max` counts slides here.
+  lamina: { type: rich-text, repeat: true, min: 1, max: 12 }

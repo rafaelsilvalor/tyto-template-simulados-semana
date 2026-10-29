@@ -1,0 +1,18 @@
+---
+template: simulados-semana
+formats: [story]
+---
+// The shape of roxo's configuration: a story only, a title on two lines, and the note to the
+// story's link where the other brands sign with their signature. Through the plugin file's
+// alias `simulados-semana-roxo` the note comes from the configuration and the brief leaves it out.
+
+::titulo
+  Programação da
+  Agenda de Simulados
+
+::nota
+  Clique no link para mais informações
+
+::lamina
+  Sábado 26/09 | Aplicação às 08h & correção às 14h
+  2º Simulado Especial Receita Federal - Auditor Fiscal - Pré-Edital
