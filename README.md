@@ -112,6 +112,9 @@ The tests, all without Tyto:
 - `tests/configurations.test.ts`: what a configuration changes — a kit's accent and signature
   reach the drawing, ocre's accent without one, `nota` replaces the signature, and the seal sits
   on the last grid and on no story. The manifest declares no `values`.
+- `tests/faces.test.ts`: every face the examples draw is declared in the manifest's `faces`, and
+  nothing else. A plugin's process measures only the declared faces, so a face left out would
+  shrink the title where the built-in kept its size.
 - `tests/plugin.test.ts`: the built `dist/index.js`, loaded through `@tyto/plugin-api/testing`
   (Tyto ADR 0150), drawing a story across the isolation protocol.
 
