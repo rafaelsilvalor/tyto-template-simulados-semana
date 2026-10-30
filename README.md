@@ -26,7 +26,7 @@ templates:
   simulados-semana:
     source:
       git: https://github.com/rafaelsilvalor/tyto-template-simulados-semana.git
-      ref: v1.0.0
+      ref: v1.0.1
     configurations:
       # No `alias` lines: each configuration's alias is `simulados-semana-<name>`, the name
       # briefs already write.
