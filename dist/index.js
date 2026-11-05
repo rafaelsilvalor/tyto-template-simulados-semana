@@ -4,7 +4,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.4.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-YTKBFVV6.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.5.2/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-YTKBFVV6.js
 var PAPER = "#fbfbfb";
 var INK = "#000000";
 var ZEBRA = "#f2f2f4";
@@ -19758,7 +19758,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.34.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-MM4QDHSJ.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.39.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-WZSLWFYX.js
 var SVG_MARKUP_WAY_OUT = "only flat shapes painted by presentation attributes are inlined: draw it as a contour (a vector of kind 'path'), place it as a PNG, or re-export it from Illustrator with Styling set to Presentation Attributes";
 var diagnosticCodes = {
   // Three syntax codes and not one, because fatality is a property of the code and one
@@ -20262,6 +20262,88 @@ var diagnosticCodes = {
     fatal: false,
     fatality: "The commit locked before loads when there is one; otherwise nothing from that source does."
   },
+  // The gallery (ADR 0162): a maintained index of templates and plugins, and the CLI verbs that
+  // write its entries into the machine's plugin files. Tolerant per entry, as a plugin file is.
+  E_GALLERY_INDEX_SYNTAX: {
+    severity: "error",
+    summary: "The gallery index could not be read or is not YAML of the shape it needs.",
+    template: "Gallery index '{index}' was not read: {problem}.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "The gallery lists nothing; templates and plugins already installed still load."
+  },
+  E_GALLERY_INDEX_ENTRY: {
+    severity: "error",
+    summary: "An entry of the gallery index is refused, and the others stand.",
+    template: "Gallery index '{index}': entry {entry} was refused: {problem}.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "Only that entry is missing from the gallery."
+  },
+  W_GALLERY_INDEX_KEY_UNKNOWN: {
+    severity: "warning",
+    summary: "The gallery index has a key Tyto does not know.",
+    template: "Gallery index '{index}': unknown key {path}; it is ignored.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "The key is ignored and the entry stands."
+  },
+  E_GALLERY_INDEX_FETCH: {
+    severity: "error",
+    summary: "The gallery index could not be fetched, and no copy was fetched before.",
+    template: "Could not fetch the gallery index '{index}': {problem}.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "The gallery lists nothing; templates and plugins already installed still load."
+  },
+  W_GALLERY_INDEX_OFFLINE: {
+    severity: "warning",
+    summary: "The gallery index could not be fetched, and the copy fetched before is shown.",
+    template: "Could not fetch the gallery index '{index}': {problem}. Showing the copy from {fetched}.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "The earlier copy is read instead, and may miss a newer version."
+  },
+  E_GALLERY_ENTRY_UNKNOWN: {
+    severity: "error",
+    summary: "A gallery command names an entry the index does not list.",
+    template: "The gallery index lists no entry '{entry}'.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "Nothing is written."
+  },
+  E_GALLERY_ENGINE: {
+    severity: "error",
+    summary: "A gallery entry needs a plugin API this Tyto does not provide.",
+    template: "'{entry}' needs plugin API {range}, and this Tyto provides {version}; update Tyto first.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "Nothing is written; the entry stays listed."
+  },
+  E_GALLERY_NOT_INSTALLED: {
+    severity: "error",
+    summary: "tyto gallery update names an entry no machine plugin file holds.",
+    template: "'{entry}' is not in any plugin file of this machine; install it first.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "Nothing is written."
+  },
+  E_GALLERY_ENTRY_EDITED: {
+    severity: "error",
+    summary: "The plugin file entry the gallery wrote was changed by hand since.",
+    template: "'{entry}' in '{file}' was changed by hand since the gallery wrote it ({written} is now {found}); nothing was moved. Pass --force to move it anyway.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "Nothing is written."
+  },
+  E_GALLERY_WRITE: {
+    severity: "error",
+    summary: "The gallery could not write an entry into a plugin file without changing the rest of it.",
+    template: "Could not write '{entry}' into '{file}': {problem}. The file was left as it was.",
+    spec: "docs/adr/0162-a-gallery-index-lists-templates-and-plugins.md",
+    fatal: false,
+    fatality: "Nothing is written."
+  },
   E_SCENE_SHAPE: {
     severity: "error",
     summary: "A scene does not match the IR schema.",
@@ -20565,6 +20647,17 @@ var diagnosticCodes = {
     fatal: false,
     fatality: "A warning never replaces a value (ADR 0013)."
   },
+  // Raised by `compile` while it lays out text, on the host only (ADR 0168): the host lays out
+  // every frame again with every bundled face, a code template's included, so it is the one
+  // place that sees the whole symbol chain and the layout that is drawn.
+  W_GLYPH_MISSING: {
+    severity: "warning",
+    summary: "Text uses characters that neither its font nor the bundled symbol faces can draw.",
+    template: "Text in slot '{slot}' uses {glyphs}, which neither '{font}' nor the bundled symbol faces can draw, in format '{format}'. Another font on this machine may draw them, measured wrong.",
+    spec: "docs/adr/0168-a-glyph-its-face-lacks-is-drawn-in-the-symbol-face.md",
+    fatal: false,
+    fatality: "The artwork is drawn. The characters are measured as the font measures a glyph it lacks, and the browser draws them in whatever face it finds, so the line around them may break or align wrong."
+  },
   // Raised by a template through `context.report` rather than by a stage (ADR 0058). The
   // template names only the code and how far it ran over; `compile` fills in the artwork and
   // the format and points the range at the directive the artwork came from.
@@ -20572,6 +20665,27 @@ var diagnosticCodes = {
     severity: "warning",
     summary: "An artwork's content runs past the room its template has for it in one format.",
     template: "Artwork '{artwork}' does not fit format '{format}': its content runs {overflow}px past the room the template has, and that part is cut.",
+    spec: "docs/adr/0058-a-template-reports-warnings-beside-its-frame.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
+  // Raised by a template the same way (ADR 0167): every adjustment it allowed itself was tried
+  // and a paragraph still ends on a line of one word. The art is drawn with that line.
+  W_TEMPLATE_ORPHAN: {
+    severity: "warning",
+    summary: "A paragraph of an artwork ends on a line holding a single word in one format.",
+    template: "Artwork '{artwork}' ends a paragraph on the single word '{word}' in format '{format}': no size or letter spacing within the template's limits moved another word down to it.",
+    spec: "docs/adr/0167-a-template-spaces-its-blocks-by-weight-and-keeps-orphans-off-its-text.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
+  // Raised by a template the same way (TYTO-502): a file it draws with, a format's background
+  // say, is not in its folder. A warning, as every template report is (ADR 0058): the rest of
+  // the frame is drawn, and the person sees which file to put back.
+  W_TEMPLATE_FILE_MISSING: {
+    severity: "warning",
+    summary: "A file an artwork's template draws with is not in the template's folder in one format.",
+    template: "Artwork '{artwork}' is drawn without '{path}' in format '{format}': template '{template}' has no such file in its folder.",
     spec: "docs/adr/0058-a-template-reports-warnings-beside-its-frame.md",
     fatal: false,
     fatality: "A warning never replaces a value (ADR 0013)."
@@ -21090,6 +21204,17 @@ var diagnosticCodes = {
     fatal: true,
     fatality: "Nothing is rendered: there is no delivery to write into."
   },
+  // ADR 0161: a delivery's export copies the brief's images into its `assets/`, and a file of
+  // the same name with other bytes is the person's. A warning, because the artwork is exactly
+  // what the brief asked for; it exists so the copy that did not happen is never silent.
+  W_DELIVERY_ASSET_KEPT: {
+    severity: "warning",
+    summary: "A delivery's assets folder already holds a different file under the name an image would be copied to.",
+    template: "Kept '{path}', which differs from the image '{source}' the brief uses; that image was not copied.",
+    spec: "docs/adr/0161-a-deliverys-export-copies-the-briefs-images-into-its-assets.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
   E_TRUST_FILE: {
     severity: "error",
     summary: "TYTO_HOME/trust.json cannot be read or written.",
@@ -21403,6 +21528,13 @@ function diagnostic(code, params, options = {}) {
     ...options.hint !== void 0 ? { hint: options.hint } : {}
   };
 }
+var origins = /* @__PURE__ */ new WeakMap();
+function rememberOrigin(run2, range) {
+  origins.set(run2, range);
+}
+function originOf(run2) {
+  return origins.get(run2);
+}
 var unitInterval = external_exports.number().min(0).max(1);
 var finite = external_exports.number().finite();
 var nonNegative = external_exports.number().finite().nonnegative();
@@ -21489,10 +21621,15 @@ var effectSchema = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("shadow"),
     x: finite,
     y: finite,
+    /**
+     * The Gaussian's standard deviation, which is how CSS `drop-shadow()` reads its length
+     * and what SVG's `stdDeviation` is — every exporter writes it unconverted (ADR 0156).
+     */
     blur: nonNegative,
     spread: finite,
     color: colorSchema
   }),
+  /** `radius` is a standard deviation too, as CSS `blur()` reads it. */
   external_exports.strictObject({ kind: external_exports.literal("blur"), radius: nonNegative }),
   external_exports.strictObject({ kind: external_exports.literal("background-blur"), radius: nonNegative })
 ]);
@@ -21574,13 +21711,6 @@ function run(text2, options) {
     ...options.decoration !== void 0 ? { decoration: options.decoration } : {}
   };
 }
-var origins = /* @__PURE__ */ new WeakMap();
-function rememberOrigin(run2, range) {
-  origins.set(run2, range);
-}
-function originOf(run2) {
-  return origins.get(run2);
-}
 var BOLD = 700;
 var sameColor = (a, b) => a.r === b.r && a.g === b.g && a.b === b.b && a.a === b.a;
 var sameStops = (a, b) => a.length === b.length && a.every((stop2, index) => {
@@ -21615,9 +21745,9 @@ function absorbedByPrevious(target, produced, range) {
 function styled(inline, style2, options) {
   switch (inline.kind) {
     case "bold":
-      return { ...style2, weight: options.bold ?? BOLD };
+      return typeof options.bold === "object" ? { ...style2, weight: BOLD, ...options.bold } : { ...style2, weight: options.bold ?? BOLD };
     case "italic":
-      return { ...style2, style: "italic" };
+      return { ...style2, ...options.italic, style: "italic" };
     case "mark":
       return { ...style2, ...options.mark?.(inline.key, inline.value) };
     default:
@@ -21650,7 +21780,7 @@ function runsOf(text2, base2, options = {}) {
   return runs;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.34.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.39.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
 function base(options) {
   return {
     transform: { ...identityTransform, ...options.transform },
@@ -21752,7 +21882,7 @@ function frame(options) {
   };
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.5.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.11.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
 function shifted(draft, dx, dy) {
   const transform2 = {
     ...draft.transform,
@@ -21804,6 +21934,62 @@ function at(x, y, item) {
 function groupOf(children, name) {
   return group({ children, ...name === void 0 ? {} : { name } });
 }
+var NUMBER = String.raw`\d[\d.,]*`;
+var UNITS = [
+  "s",
+  "ms",
+  "min",
+  "h",
+  "m",
+  "km",
+  "cm",
+  "mm",
+  "kg",
+  "g",
+  "mg",
+  "N",
+  "kN",
+  "J",
+  "kJ",
+  "W",
+  "kW",
+  "kWh",
+  "V",
+  "mV",
+  "A",
+  "mA",
+  "Hz",
+  "kHz",
+  "MHz",
+  "Pa",
+  "kPa",
+  "MPa",
+  "K",
+  "\xB0C",
+  "L",
+  "mL",
+  "rad",
+  "mol",
+  "\u03A9"
+];
+var KEEP_TOGETHER_RULES = [
+  { name: "currency sign + amount", before: String.raw`(?:R\$|US\$|€)`, after: String.raw`\d` },
+  {
+    name: "amount + scale word",
+    before: NUMBER,
+    after: String.raw`(?:mil|milhão|milhões|bi|bilhão|bilhões)(?!\p{L})`
+  },
+  { name: "number + percent", before: NUMBER, after: "%" },
+  {
+    name: "number + unit",
+    before: String.raw`[\d⁰¹²³⁴⁵⁶⁷⁸⁹]`,
+    after: String.raw`(?:${UNITS.join("|")})(?!\p{L})`
+  }
+];
+var LABEL_EXCEPTIONS = [
+  { name: "a time", pattern: String.raw`\d{1,2}:\d{2}` },
+  { name: "a URL", pattern: String.raw`\p{L}[\p{L}\d+.-]*://\S*` }
+];
 function mark(shape, height, fill, name) {
   const scale = height / shape.box.h;
   return block(
@@ -21838,7 +22024,11 @@ function atLeastOne(runs) {
 }
 function runsIn(value, style2) {
   return atLeastOne(
-    runsOf(value, { font: style2.font, size: style2.size, weight: style2.weight, color: style2.color })
+    runsOf(
+      value,
+      { font: style2.font, size: style2.size, weight: style2.weight, color: style2.color },
+      style2.highlights?.options
+    )
   );
 }
 function nothing(width, height) {
@@ -22108,7 +22298,7 @@ function drawRow(style2, placed, fields2, width, measure) {
     return { ...each, fields: own2 };
   });
   const stacks = cells.map(
-    (cell) => cell.column.kind === "lines" ? linesOf(cell.column, cell.width, cell.fields, measure) : void 0
+    (cell) => cell.column.kind === "lines" ? linesOf2(cell.column, cell.width, cell.fields, measure) : void 0
   );
   const height = cells.reduce((tallest, cell, index) => {
     const lines2 = stacks[index];
@@ -22129,7 +22319,7 @@ function drawRow(style2, placed, fields2, width, measure) {
     })
   );
 }
-function linesOf(column, width, fields2, measure) {
+function linesOf2(column, width, fields2, measure) {
   const inner = width - column.padding.left - column.padding.right;
   return stack({
     gap: column.lineGap,
@@ -22190,7 +22380,7 @@ function shift(draft, dx, dy) {
   return at(dx, dy, block(0, 0, draft));
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.4.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-EIGOHDOF.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.5.2/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-EIGOHDOF.js
 var PLACEHOLDER_LOGO = {
   box: { w: 186.09, h: 376.79 },
   d: (
@@ -22238,7 +22428,7 @@ function signatureOf(kit) {
   return kit.signature ?? PLACEHOLDER_SIGNATURE;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.4.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.5.2/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
 var PAPER2 = "#ffffff";
 var TITLE_INK = "#7c7c7c";
 var ROW = "#e7e7e7";
@@ -22495,7 +22685,7 @@ function richTextOf2(context, name) {
   const value = context.slots[name]?.value;
   return value?.kind === "rich-text" ? value.text : void 0;
 }
-var NUMBER = String.raw`\d[\d.,]*`;
+var NUMBER2 = String.raw`\d[\d.,]*`;
 var TABLE_VALUE_DEFAULTS = {
   "title-gap": TITLE.gap,
   "title-floor": TITLE.floor,
