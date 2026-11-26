@@ -4,7 +4,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
 var PAPER = "#fbfbfb";
 var INK = "#000000";
 var ZEBRA = "#f2f2f4";
@@ -1363,9 +1363,9 @@ var Class = class {
   constructor(..._args) {
   }
 };
-function members(proto, table) {
-  for (const key in table) {
-    const desc = Object.getOwnPropertyDescriptor(table, key);
+function members(proto, table2) {
+  for (const key in table2) {
+    const desc = Object.getOwnPropertyDescriptor(table2, key);
     if (desc.get)
       Object.defineProperty(proto, key, { ...desc, enumerable: false });
     else
@@ -1380,10 +1380,10 @@ function hide(inst, key, value) {
   return own(inst, key, value, false);
 }
 // @__NO_SIDE_EFFECTS__
-function derived(computes, table) {
+function derived(computes, table2) {
   for (const key in computes) {
     const compute = computes[key];
-    Object.defineProperty(table, key, {
+    Object.defineProperty(table2, key, {
       configurable: true,
       enumerable: true,
       get() {
@@ -1394,7 +1394,7 @@ function derived(computes, table) {
       }
     });
   }
-  return table;
+  return table2;
 }
 function defineBound(proto, key, fn) {
   Object.defineProperty(proto, key, {
@@ -19758,7 +19758,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.55.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-IT6P3KDS.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.59.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-NUEMZ7BR.js
 var SVG_MARKUP_WAY_OUT = "only flat shapes painted by presentation attributes are inlined: draw it as a contour (a vector of kind 'path'), place it as a PNG, or re-export it from Illustrator with Styling set to Presentation Attributes";
 var diagnosticCodes = {
   // Three syntax codes and not one, because fatality is a property of the code and one
@@ -19821,6 +19821,24 @@ var diagnosticCodes = {
     spec: "docs/brief-language.md",
     fatal: false,
     fatality: "The value of one slot; it stays unset and the rest of the artwork is drawn anyway."
+  },
+  E_BAD_COMUM: {
+    severity: "error",
+    summary: "A `::comum` line, which closes the slides, carries text or adjustments, or is written where there are no slides to close.",
+    template: "'::comum' {problem}.",
+    spec: "docs/brief-language.md",
+    fatal: false,
+    fatality: "One line: what it carries is ignored, and a misplaced one closes nothing while the rest of the brief is read as written."
+  },
+  // An error, not a warning (ADR 0227): an anchor that places nothing would leave the block
+  // off that artwork without a word.
+  E_BAD_BLOCK_NAME: {
+    severity: "error",
+    summary: "A shared block's name, or an empty directive that places one on a slide, does not name a shared block once.",
+    template: "'::{slot}' {problem}.",
+    spec: "docs/adr/0227-shared-and-slide-blocks-add-up-and-a-named-block-is-placed-by-name.md",
+    fatal: false,
+    fatality: "One line: the name or the anchor is ignored, and the shared block is drawn where it was written."
   },
   E_UNKNOWN_SLOT: {
     severity: "error",
@@ -20926,6 +20944,17 @@ var diagnosticCodes = {
     fatal: false,
     fatality: "A warning never replaces a value (ADR 0013)."
   },
+  // Raised by a template the same way (TYTO-837): two colours it draws text in, chosen by a
+  // brief or a configuration (ADR 0226), are too close to read well. A warning: the person
+  // chose the colours, and the frame is drawn in them.
+  W_TEMPLATE_LOW_CONTRAST: {
+    severity: "warning",
+    summary: "Two colours an artwork draws text in have too little contrast to read well.",
+    template: "Artwork '{artwork}' in format '{format}': '{foreground}' on '{background}' has a contrast of {ratio}:1, too little for template '{template}' to read well; the colours are kept.",
+    spec: "docs/adr/0058-a-template-reports-warnings-beside-its-frame.md",
+    fatal: false,
+    fatality: "A warning never replaces a value (ADR 0013)."
+  },
   W_EXTERNAL_ART_MISSING: {
     severity: "warning",
     summary: "A slot whose art is painted outside Tyto has no file yet, and an outlined box stands in for it (ADR 0220).",
@@ -20946,7 +20975,7 @@ var diagnosticCodes = {
   },
   W_TEMPLATE_VALUE_INVALID: {
     severity: "warning",
-    summary: "A configuration sets a declared value to one of the wrong kind or outside its limits.",
+    summary: "A configuration or a brief's frontmatter sets a declared value to one of the wrong kind or outside its limits.",
     template: "Value '{name}' of template '{template}' {problem}; the template's default is used.",
     spec: "docs/adr/0153-a-template-declares-its-configurable-values-in-its-manifest.md",
     fatal: false,
@@ -22307,7 +22336,7 @@ function runsOf(text2, base2, options = {}) {
   return runs;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.55.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.59.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
 function base(options) {
   return {
     transform: { ...identityTransform, ...options.transform },
@@ -22409,7 +22438,7 @@ function frame(options) {
   };
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.15.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.24.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
 function shifted(draft, dx, dy) {
   const transform2 = {
     ...draft.transform,
@@ -22531,20 +22560,6 @@ function mark(shape, height, fill, name) {
     })
   );
 }
-function sealed(size, seal) {
-  if (seal === void 0) return { size, seal: [] };
-  const band = { w: size.w, h: seal.height };
-  const art = block(
-    band.w,
-    band.h,
-    image({ name: "seal", asset: seal.asset, size: band, fit: "cover" })
-  );
-  return { size: { w: size.w, h: size.h - seal.height }, seal: [at(0, size.h - seal.height, art)] };
-}
-function reportOverflow(report, bottom, limit) {
-  const overflow = bottom - limit;
-  if (overflow > 0) report({ code: "W_TEMPLATE_OVERFLOW", overflow });
-}
 var FIELD_SEPARATOR = "|";
 function rowGroups(text2, fieldCount, grouped, headingFields = 1) {
   const result = [];
@@ -22617,15 +22632,15 @@ function sliceOf(inline, part, whole) {
   };
 }
 function trimEnds(field) {
-  const trimmed = [...field];
-  const first = trimmed[0];
-  if (first?.kind === "text") trimmed[0] = { ...first, value: first.value.replace(/^\s+/u, "") };
-  const lastIndex = trimmed.length - 1;
-  const final = trimmed[lastIndex];
+  const trimmed2 = [...field];
+  const first = trimmed2[0];
+  if (first?.kind === "text") trimmed2[0] = { ...first, value: first.value.replace(/^\s+/u, "") };
+  const lastIndex = trimmed2.length - 1;
+  const final = trimmed2[lastIndex];
   if (final?.kind === "text") {
-    trimmed[lastIndex] = { ...final, value: final.value.replace(/\s+$/u, "") };
+    trimmed2[lastIndex] = { ...final, value: final.value.replace(/\s+$/u, "") };
   }
-  return trimmed.filter((inline) => inline.kind !== "text" || inline.value !== "");
+  return trimmed2.filter((inline) => inline.kind !== "text" || inline.value !== "");
 }
 function atLeastOne(runs) {
   const [first, ...rest] = runs;
@@ -22668,10 +22683,215 @@ function naturalWidth(value, style2, measure) {
   const measured = measure(text({ runs, box: {} }));
   return measured === void 0 ? void 0 : Math.ceil(measured.width);
 }
+function sealed(size, seal) {
+  if (seal === void 0) return { size, seal: [] };
+  const band = { w: size.w, h: seal.height };
+  const art = block(
+    band.w,
+    band.h,
+    image({ name: "seal", asset: seal.asset, size: band, fit: "cover" })
+  );
+  return { size: { w: size.w, h: size.h - seal.height }, seal: [at(0, size.h - seal.height, art)] };
+}
+function reportOverflow(report, bottom, limit) {
+  const overflow = bottom - limit;
+  if (overflow > 0) report({ code: "W_TEMPLATE_OVERFLOW", overflow });
+}
+var NO_PADDING = { top: 0, bottom: 0, left: 0, right: 0 };
+function table(style2, rows, width) {
+  const placed = placeColumns(style2, rows, width);
+  const seen = /* @__PURE__ */ new Map();
+  const drawn = rows.map((row2, index) => {
+    const count = seen.get(row2.kind) ?? 0;
+    seen.set(row2.kind, count + 1);
+    const edges = { first: index === 0, last: index === rows.length - 1 };
+    return row2.span === true ? drawBand(style2, placed, row2, count, edges, width) : drawRow(style2, placed, row2, count, edges, width);
+  });
+  return stack({
+    ...style2.names.table === void 0 ? {} : { name: style2.names.table },
+    gap: style2.rowGap,
+    items: drawn
+  });
+}
+function gapOf(style2) {
+  return (style2.layering ?? "side-by-side") === "side-by-side" ? style2.columnGap ?? 0 : 0;
+}
+function paddingOf(column) {
+  return column.padding ?? NO_PADDING;
+}
+function placeColumns(style2, rows, width) {
+  const gap = gapOf(style2);
+  const widths = style2.columns.map((column, index) => {
+    if (typeof column.width === "number" || column.width === "fill") return column.width;
+    const padding = paddingOf(column);
+    let widest = 0;
+    for (const row2 of rows) {
+      if (row2.span === true) continue;
+      const natural = row2.cells[index]?.naturalWidth?.();
+      if (natural !== void 0) widest = Math.max(widest, natural);
+    }
+    return Math.max(column.width.measured.min, padding.left + widest + padding.right);
+  });
+  const taken = widths.reduce((sum, each) => sum + (each === "fill" ? 0 : each), 0);
+  const fill = width - taken - gap * Math.max(0, style2.columns.length - 1);
+  let x = 0;
+  return style2.columns.map((column, index) => {
+    const own2 = widths[index];
+    const columnWidth = own2 === "fill" ? fill : own2;
+    const result = { column, index, x, width: columnWidth };
+    x += columnWidth + gap;
+    return result;
+  });
+}
+function fillOf(style2, kind, column, count) {
+  const paint = style2.kinds[kind];
+  if (paint === void 0) return void 0;
+  if (paint.zebra !== void 0 && paint.zebra.length > 0) {
+    return paint.zebra[count % paint.zebra.length] ?? void 0;
+  }
+  return typeof paint.fill === "string" ? paint.fill : paint.fill?.[column];
+}
+function cornersOf(style2, column, edges, left, right) {
+  if (column?.radius !== void 0) return column.radius;
+  const corners = style2.corners;
+  if (corners === void 0) return void 0;
+  if (corners.at === "every-cell") return corners.radius;
+  const r = corners.radius;
+  const tuple2 = [
+    edges.first && left ? r : 0,
+    edges.first && right ? r : 0,
+    edges.last && right ? r : 0,
+    edges.last && left ? r : 0
+  ];
+  return tuple2.every((each) => each === 0) ? void 0 : tuple2;
+}
+function drawRow(style2, placed, row2, count, edges, width) {
+  const measured = placed.map((cell) => {
+    const content = row2.cells[cell.index];
+    if (content === void 0) return void 0;
+    const padding = paddingOf(cell.column);
+    return content.draw(cell.width - padding.left - padding.right);
+  });
+  const height = placed.reduce(
+    (tallest, cell, index) => {
+      const content = row2.cells[cell.index];
+      const own2 = measured[index];
+      if (content === void 0 || own2 === void 0 || content.sizesRow === false) {
+        return tallest;
+      }
+      const padding = paddingOf(cell.column);
+      return Math.max(tallest, own2.height + padding.top + padding.bottom);
+    },
+    minHeightOf(style2, row2.kind)
+  );
+  const overlap = style2.layering === "overlap";
+  const drawn = placed.map((cell) => {
+    const padding = paddingOf(cell.column);
+    const inner = {
+      w: cell.width - padding.left - padding.right,
+      h: height - padding.top - padding.bottom
+    };
+    const content = row2.cells[cell.index]?.draw(inner.w, inner.h);
+    const origin = overlap ? 0 : cell.x;
+    const start = overlap ? cell.x : 0;
+    const shapeWidth = overlap ? cell.x + cell.width : cell.width;
+    const fill = fillOf(style2, row2.kind, cell.index, count);
+    const corners = cornersOf(
+      style2,
+      cell.column,
+      edges,
+      cell.index === 0,
+      cell.index === placed.length - 1
+    );
+    return shift(
+      cellGroup(cell.column.name, { w: shapeWidth, h: height }, fill, corners, content, {
+        x: start + padding.left,
+        y: padding.top + offsetOf2(cell.column.valign, inner.h, content)
+      }),
+      origin,
+      0
+    );
+  });
+  return block(
+    width,
+    height,
+    group({
+      name: rowNameOf(style2, row2.kind),
+      // Painted in order, so under `overlap` the earlier cells go last and cover the
+      // rounded left ends of the later ones.
+      children: overlap ? drawn.reverse() : drawn
+    })
+  );
+}
+function drawBand(style2, placed, row2, count, edges, width) {
+  const first = placed[0]?.column;
+  const last = placed[placed.length - 1]?.column;
+  const padding = {
+    top: first === void 0 ? 0 : paddingOf(first).top,
+    bottom: first === void 0 ? 0 : paddingOf(first).bottom,
+    left: first === void 0 ? 0 : paddingOf(first).left,
+    right: last === void 0 ? 0 : paddingOf(last).right
+  };
+  const innerWidth = width - padding.left - padding.right;
+  const content = row2.cells[0];
+  const measured = content?.draw(innerWidth);
+  const height = Math.max(
+    minHeightOf(style2, row2.kind),
+    measured === void 0 || content?.sizesRow === false ? 0 : measured.height + padding.top + padding.bottom
+  );
+  const innerHeight = height - padding.top - padding.bottom;
+  const drawn = content?.draw(innerWidth, innerHeight);
+  const corners = cornersOf(style2, void 0, edges, true, true);
+  return block(
+    width,
+    height,
+    group({
+      name: rowNameOf(style2, row2.kind),
+      children: [
+        cellGroup(
+          style2.names.band ?? "band",
+          { w: width, h: height },
+          fillOf(style2, row2.kind, 0, count),
+          corners,
+          drawn,
+          { x: padding.left, y: padding.top + offsetOf2(first?.valign, innerHeight, drawn) }
+        )
+      ]
+    })
+  );
+}
+function rowNameOf(style2, kind) {
+  return style2.kinds[kind]?.name ?? style2.names.row;
+}
+function minHeightOf(style2, kind) {
+  return style2.kinds[kind]?.minHeight ?? style2.minRowHeight;
+}
+function offsetOf2(valign, room, content) {
+  if (content === void 0) return 0;
+  const spare = room - content.height;
+  if (spare <= 0) return 0;
+  const where = valign ?? "middle";
+  if (where === "top") return 0;
+  return where === "bottom" ? spare : spare / 2;
+}
+function cellGroup(name, size, fill, corners, content, place) {
+  const children = [];
+  if (fill !== void 0) {
+    children.push(
+      rect({ size, ...corners === void 0 ? {} : { radius: corners }, fill: solid(fill) })
+    );
+  }
+  if (content !== void 0) children.push(shift(content.draft, place.x, place.y));
+  return group({ name, children });
+}
+function shift(draft, dx, dy) {
+  if (dx === 0 && dy === 0) return draft;
+  return at(dx, dy, block(0, 0, draft));
+}
 function rewritten(value, rewrite) {
   return rewrite === void 0 || value.length === 0 ? value : rewrite(value);
 }
-function pillTable(style2, content) {
+function slotTable(style2, content) {
   const fieldCount = style2.columns.reduce((sum, column) => sum + fieldsOf(column), 0);
   const caption = style2.groups?.caption;
   const groups = rowGroups(
@@ -22682,12 +22902,11 @@ function pillTable(style2, content) {
   );
   const drawRows = (rows, name, gap, band) => {
     const width = rowWidth(style2, rows, content);
-    const placed = placeColumns(style2, width);
-    const drawn = stack({
-      ...name === void 0 ? {} : { name },
-      gap,
-      items: rows.map((fields2) => drawRow(style2, placed, fields2, width, content.measure))
-    });
+    const drawn = table(
+      { ...tableStyleOf(style2, name), rowGap: gap },
+      rows.map((fields2) => ({ kind: ROW, cells: cellsOf(style2, fields2, content.measure) })),
+      width
+    );
     if (caption === void 0 || band === void 0) return centred(drawn, content.width);
     return centred(
       stack({ gap: caption.gap, items: [captionBand(caption, band, width), drawn] }),
@@ -22755,7 +22974,7 @@ function captionBand(caption, value, width) {
           radius: caption.shape.radius,
           fill: solid(caption.shape.fill)
         }),
-        shift(words.draft, caption.padding.left, 0)
+        shift2(words.draft, caption.padding.left, 0)
       ]
     })
   );
@@ -22801,53 +23020,48 @@ function naturalRowWidth(style2, fields2, measure) {
 function fieldsOf(column) {
   return column.kind === "label" ? 1 : column.lines.length;
 }
-function placeColumns(style2, width) {
-  const gap = style2.layering === "side-by-side" ? style2.columnGap ?? 0 : 0;
-  const fixed = style2.columns.reduce(
-    (sum, column) => sum + (column.width === "fill" ? 0 : column.width),
-    0
-  );
-  const fill = width - fixed - gap * Math.max(0, style2.columns.length - 1);
-  let x = 0;
-  return style2.columns.map((column) => {
-    const columnWidth = column.width === "fill" ? fill : column.width;
-    const result = { column, x, width: columnWidth };
-    x += columnWidth + gap;
-    return result;
-  });
+function tableStyleOf(style2, name) {
+  return {
+    columns: style2.columns.map((column) => ({
+      name: column.name,
+      width: column.width,
+      ...column.kind === "lines" ? { padding: column.padding } : {},
+      ...column.shape === void 0 ? {} : { radius: column.shape.radius }
+    })),
+    kinds: { [ROW]: { fill: style2.columns.map((column) => column.shape?.fill) } },
+    layering: style2.layering,
+    ...style2.columnGap === void 0 ? {} : { columnGap: style2.columnGap },
+    rowGap: style2.rowGap,
+    minRowHeight: style2.minRowHeight,
+    names: { ...name === void 0 ? {} : { table: name }, row: style2.names.row }
+  };
 }
-function drawRow(style2, placed, fields2, width, measure) {
+var ROW = "row";
+function cellsOf(style2, fields2, measure) {
   let next = 0;
-  const cells = placed.map((each) => {
-    const count = fieldsOf(each.column);
+  return style2.columns.map((column) => {
+    const count = fieldsOf(column);
     const own2 = Array.from({ length: count }, (_, index) => fields2[next + index] ?? []);
     next += count;
-    return { ...each, fields: own2 };
+    return column.kind === "lines" ? { draw: (width) => linesOf2(column, width, own2, measure) } : labelCell(column, own2[0] ?? []);
   });
-  const stacks = cells.map(
-    (cell) => cell.column.kind === "lines" ? linesOf2(cell.column, cell.width, cell.fields, measure) : void 0
-  );
-  const height = cells.reduce((tallest, cell, index) => {
-    const lines2 = stacks[index];
-    if (lines2 === void 0 || cell.column.kind !== "lines") return tallest;
-    return Math.max(tallest, lines2.height + cell.column.padding.top + cell.column.padding.bottom);
-  }, style2.minRowHeight);
-  const drawn = cells.map(
-    (cell, index) => drawCell(style2, cell, cell.fields, stacks[index], height)
-  );
-  return block(
-    width,
-    height,
-    group({
-      name: style2.names.row,
-      // Painted in order, so under `overlap` the earlier cells go last and cover the
-      // rounded left ends of the later ones.
-      children: style2.layering === "overlap" ? drawn.reverse() : drawn
-    })
-  );
 }
-function linesOf2(column, width, fields2, measure) {
-  const inner = width - column.padding.left - column.padding.right;
+function labelCell(column, value) {
+  return {
+    sizesRow: false,
+    draw: (width, height) => height === void 0 ? block(width, 0, group({ children: [] })) : textBlock(
+      rewritten(value, column.text.rewrite),
+      { w: width, h: height },
+      column.text.style,
+      {
+        name: column.text.name,
+        ...column.text.align === void 0 ? {} : { align: column.text.align },
+        ...column.text.valign === void 0 ? {} : { valign: column.text.valign }
+      }
+    )
+  };
+}
+function linesOf2(column, inner, fields2, measure) {
   return stack({
     gap: column.lineGap,
     items: column.lines.map(
@@ -22864,50 +23078,90 @@ function linesOf2(column, width, fields2, measure) {
     )
   });
 }
-function drawCell(style2, cell, fields2, lines2, height) {
-  const overlap = style2.layering === "overlap";
-  const origin = overlap ? 0 : cell.x;
-  const start = overlap ? cell.x : 0;
-  const shapeWidth = overlap ? cell.x + cell.width : cell.width;
-  const children = [];
-  if (cell.column.shape !== void 0) {
-    children.push(
-      rect({
-        size: { w: shapeWidth, h: height },
-        radius: cell.column.shape.radius,
-        fill: solid(cell.column.shape.fill)
-      })
-    );
-  }
-  if (cell.column.kind === "label") {
-    const words = textBlock(
-      rewritten(fields2[0] ?? [], cell.column.text.rewrite),
-      { w: cell.width, h: height },
-      cell.column.text.style,
-      {
-        name: cell.column.text.name,
-        ...cell.column.text.align === void 0 ? {} : { align: cell.column.text.align },
-        ...cell.column.text.valign === void 0 ? {} : { valign: cell.column.text.valign }
-      }
-    );
-    children.push(shift(words.draft, start, 0));
-  } else if (lines2 !== void 0) {
-    children.push(
-      shift(
-        lines2.draft,
-        start + cell.column.padding.left,
-        cell.column.padding.top + (height - cell.column.padding.top - cell.column.padding.bottom - lines2.height) / 2
-      )
-    );
-  }
-  return shift(group({ name: cell.column.name, children }), origin, 0);
-}
-function shift(draft, dx, dy) {
+function shift2(draft, dx, dy) {
   if (dx === 0 && dy === 0) return draft;
   return at(dx, dy, block(0, 0, draft));
 }
+function buttonWidth(button) {
+  const { style: style2 } = button;
+  const leading = button.leading === void 0 ? 0 : button.leading.width + style2.gap;
+  const trailing = style2.trailing?.width ?? 0;
+  return style2.padding.left + leading + button.words.width + style2.padding.right + trailing;
+}
+function buttonRow(buttons, options) {
+  const widths = buttons.map(buttonWidth);
+  const natural = widths.reduce((sum, each) => sum + each, 0) + options.gap * Math.max(0, buttons.length - 1);
+  const room = options.width ?? natural;
+  if (options.report !== void 0) reportOverflow(options.report, natural, room);
+  const spare = Math.max(0, room - natural);
+  const justified = options.arrange === "justified" && buttons.length > 1;
+  const gap = justified ? options.gap + spare / (buttons.length - 1) : options.gap;
+  const height = buttons.reduce((tallest, each) => Math.max(tallest, each.style.height), 0);
+  let x = justified ? 0 : spare / 2;
+  const children = buttons.map((button, index) => {
+    const drawn = drawButton(button, widths[index]);
+    const placed = at(x, (height - drawn.height) / 2, drawn);
+    x += drawn.width + gap;
+    return placed;
+  });
+  return block(
+    Math.max(room, natural),
+    height,
+    group({ name: options.name ?? "buttons", children })
+  );
+}
+function drawButton(button, width) {
+  const { style: style2 } = button;
+  const h = style2.height;
+  const middle = (piece) => (h - piece.height) / 2;
+  const children = [];
+  if (style2.fill !== void 0) {
+    children.push(
+      rect({ name: "pill", size: { w: width, h }, radius: style2.radius, fill: solid(style2.fill) })
+    );
+  }
+  if (style2.trailing !== void 0) {
+    const box = style2.trailing;
+    children.push(
+      rect({
+        name: "end",
+        size: { w: box.width, h },
+        radius: box.radius,
+        fill: solid(box.fill),
+        transform: { x: width - box.width, y: 0 }
+      })
+    );
+    if (button.trailing !== void 0) {
+      children.push(
+        at(
+          width - box.width + (box.width - button.trailing.width) / 2,
+          middle(button.trailing),
+          button.trailing
+        )
+      );
+    }
+  }
+  if (style2.stroke !== void 0) {
+    children.push(
+      rect({
+        name: "outline",
+        size: { w: width, h },
+        radius: style2.radius,
+        stroke: { paint: solid(style2.stroke.color), width: style2.stroke.width, align: "inside" }
+      })
+    );
+  }
+  let x = style2.padding.left;
+  if (button.leading !== void 0) {
+    children.push(at(x, middle(button.leading), button.leading));
+    x += button.leading.width + style2.gap;
+  }
+  children.push(at(x, middle(button.words), button.words));
+  return block(width, h, group({ name: button.name ?? "button", children }));
+}
+var NO_FILL = solid({ r: 0, g: 0, b: 0, a: 0 });
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-EIGOHDOF.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-KTMH3XT2.js
 var PLACEHOLDER_LOGO = {
   box: { w: 186.09, h: 376.79 },
   d: (
@@ -22955,10 +23209,10 @@ function signatureOf(kit) {
   return kit.signature ?? PLACEHOLDER_SIGNATURE;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.6.8/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
 var PAPER2 = "#ffffff";
 var TITLE_INK = "#7c7c7c";
-var ROW = "#e7e7e7";
+var ROW2 = "#e7e7e7";
 var ROW_INK = "#393939";
 var ON_ACCENT2 = "#ffffff";
 var FACE = systemFont("CircularXX");
@@ -23055,28 +23309,32 @@ function callToComment(words, accent, width, measure) {
   const balloonRoom = CTA.balloonGap + CTA.balloon;
   const natural = naturalWidth(words, style2, measure);
   const pill = natural === void 0 ? width - balloonRoom : Math.min(width - balloonRoom, natural + CTA.padding * 2);
-  const glyph = mark(BALLOON, CTA.balloon, accent, "balloon");
-  return block(
-    pill + balloonRoom,
-    CTA.height,
-    group({
-      name: "call-to-comment",
-      children: [
-        rect({
-          name: "cta-pill",
-          size: { w: pill, h: CTA.height },
+  const bare = {
+    height: CTA.height,
+    radius: 0,
+    padding: { left: 0, right: 0 },
+    gap: 0
+  };
+  return buttonRow(
+    [
+      {
+        name: "cta-pill",
+        style: {
+          ...bare,
           radius: CTA.height / 2,
-          stroke: { paint: solid(accent), width: CTA.stroke, align: "inside" }
-        }),
-        textBlock(words, { w: pill, h: CTA.height }, style2, {
+          stroke: { color: accent, width: CTA.stroke }
+        },
+        words: textBlock(words, { w: pill, h: CTA.height }, style2, {
           name: "cta",
           align: "center",
           valign: "middle",
           overflow: "shrink"
-        }).draft,
-        at(pill + CTA.balloonGap, (CTA.height - glyph.height) / 2, glyph)
-      ]
-    })
+        })
+      },
+      // The balloon sits in `words` until the kit's buttons can hold an icon alone (TYTO-884).
+      { name: "cta-balloon", style: bare, words: mark(BALLOON, CTA.balloon, accent, "balloon") }
+    ],
+    { gap: CTA.balloonGap, name: "call-to-comment" }
   );
 }
 var style = (size, weight, color2) => ({
@@ -23096,7 +23354,7 @@ function examTable(accent) {
         kind: "lines",
         name: "exam-row",
         width: "fill",
-        shape: { fill: ROW, radius: 0 },
+        shape: { fill: ROW2, radius: 0 },
         padding: { top: 0, bottom: 0, left: TABLE.padding, right: TABLE.padding },
         lineGap: 0,
         lines: [{ name: "exam", style: EXAM_STYLE, minHeight: TABLE.row.line }]
@@ -23140,7 +23398,7 @@ function simuladosDaSemana(own2) {
     const story = context.format === "story";
     const room = context.size.w - MARGIN * 2;
     const lamina = richTextOf2(context, "lamina") ?? [];
-    const table = pillTable(examTable(brand.accent), {
+    const table2 = slotTable(examTable(brand.accent), {
       text: lamina,
       width: tableWidth(lamina, context.measure),
       measure: context.measure
@@ -23149,7 +23407,7 @@ function simuladosDaSemana(own2) {
     const body = lastGrid ? stack({
       gap: CTA.gap,
       items: [
-        table,
+        table2,
         callToComment(
           richTextOf2(context, "chamada") ?? defaultCall(),
           brand.accent,
@@ -23157,7 +23415,7 @@ function simuladosDaSemana(own2) {
           context.measure
         )
       ]
-    }) : table;
+    }) : table2;
     const middle = stack({
       name: "middle",
       gap: TITLE2.gap,
