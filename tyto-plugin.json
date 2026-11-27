@@ -1,7 +1,7 @@
 {
   "name": "simulados-semana",
   "version": "1.1.0",
-  "engine": ">=0.28",
+  "engine": ">=0.32",
   "contributes": ["template-pack"],
   "permissions": ["font:CircularXX"]
 }
