@@ -4,7 +4,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.4/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-3KKHXN6D.js
 var PAPER = "#fbfbfb";
 var INK = "#000000";
 var ZEBRA = "#f2f2f4";
@@ -19758,7 +19758,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.59.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-NUEMZ7BR.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.60.0/node_modules/@rafaelsilvalor/tyto-core/dist/chunk-W34XOUY2.js
 var SVG_MARKUP_WAY_OUT = "only flat shapes painted by presentation attributes are inlined: draw it as a contour (a vector of kind 'path'), place it as a PNG, or re-export it from Illustrator with Styling set to Presentation Attributes";
 var diagnosticCodes = {
   // Three syntax codes and not one, because fatality is a property of the code and one
@@ -22243,7 +22243,15 @@ function run(text2, options) {
     weight: options.weight ?? 400,
     style: options.style ?? "normal",
     color: paintOf(options.color),
-    ...options.decoration !== void 0 ? { decoration: options.decoration } : {}
+    ...options.decoration !== void 0 ? { decoration: options.decoration } : {},
+    ...options.box !== void 0 ? { box: boxOf(options.box) } : {}
+  };
+}
+function boxOf(box) {
+  return {
+    paint: typeof box.paint === "object" && "kind" in box.paint ? box.paint : { kind: "solid", color: color(box.paint) },
+    padding: { x: box.padding.x, over: box.padding.over, under: box.padding.under },
+    ...box.radius !== void 0 ? { radius: box.radius } : {}
   };
 }
 var BOLD = 700;
@@ -22266,7 +22274,11 @@ function samePaint(a, b) {
   }
 }
 var sameFont = (a, b) => a.family === b.family && a.source === b.source && a.path === b.path;
-var sameStyle = (a, b) => a.size === b.size && a.weight === b.weight && a.style === b.style && a.decoration === b.decoration && sameFont(a.font, b.font) && samePaint(a.color, b.color);
+function sameBox(a, b) {
+  if (a === void 0 || b === void 0) return a === b;
+  return a.padding.x === b.padding.x && a.padding.over === b.padding.over && a.padding.under === b.padding.under && a.radius === b.radius && samePaint(a.paint, b.paint);
+}
+var sameStyle = (a, b) => a.size === b.size && a.weight === b.weight && a.style === b.style && a.decoration === b.decoration && sameFont(a.font, b.font) && samePaint(a.color, b.color) && sameBox(a.box, b.box);
 function absorbedByPrevious(target, produced, range) {
   const previous = target[target.length - 1];
   if (previous === void 0 || previous.kind !== "text") return false;
@@ -22336,7 +22348,7 @@ function runsOf(text2, base2, options = {}) {
   return runs;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.59.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-core@0.60.0/node_modules/@rafaelsilvalor/tyto-core/dist/template.js
 function base(options) {
   return {
     transform: { ...identityTransform, ...options.transform },
@@ -22438,7 +22450,37 @@ function frame(options) {
   };
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.24.0/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-template-kit@0.27.1/node_modules/@rafaelsilvalor/tyto-template-kit/dist/index.js
+function parameterValues(schema, given = {}) {
+  const values = {};
+  for (const [name, declared] of Object.entries(schema)) {
+    const value = given[name];
+    values[name] = valueWithin(declared, value);
+  }
+  return values;
+}
+function valueWithin(declared, value) {
+  if (declared.kind === "choice") {
+    return typeof value === "string" && declared.choices.includes(value) ? value : declared.default;
+  }
+  if (typeof value !== "number" || Number.isNaN(value)) return declared.default;
+  return Math.min(declared.max ?? Infinity, Math.max(declared.min ?? -Infinity, value));
+}
+function anchorOf(item) {
+  return item.anchor ?? { capTop: 0, baseline: item.height };
+}
+function anchorAcross(items, offsets) {
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (first === void 0 || last === void 0) return {};
+  if (!items.some((item) => item.anchor !== void 0)) return {};
+  return {
+    anchor: {
+      capTop: offsets[0] + anchorOf(first).capTop,
+      baseline: offsets[items.length - 1] + anchorOf(last).baseline
+    }
+  };
+}
 function shifted(draft, dx, dy) {
   const transform2 = {
     ...draft.transform,
@@ -22472,23 +22514,169 @@ function block(width, height, draft) {
   return { width, height, draft };
 }
 function stack(options) {
-  const gap = options.gap ?? 0;
-  const align = options.align ?? "start";
-  const width = options.items.reduce((widest, item) => Math.max(widest, item.width), 0);
+  return blockOnly(
+    stackIn(
+      UNBOUNDED,
+      options.items,
+      { gap: options.gap ?? 0, align: options.align ?? "start" },
+      { ...options.name === void 0 ? {} : { name: options.name } }
+    )
+  );
+}
+var UNBOUNDED = { width: Infinity, height: Infinity };
+function blockOnly(item) {
+  return {
+    width: item.width,
+    height: item.height,
+    draft: item.draft,
+    ...item.anchor === void 0 ? {} : { anchor: item.anchor }
+  };
+}
+function overrun(size, room) {
+  return Number.isFinite(room) ? Math.max(0, size - room) : 0;
+}
+var STACK_PARAMETERS = {
+  gap: {
+    kind: "length",
+    default: 0,
+    description: "Space between neighbours, in px; an item may state its own gap above it."
+  },
+  align: {
+    kind: "choice",
+    default: "start",
+    choices: ["start", "center", "end"],
+    description: "Where a narrower child sits across the stack."
+  },
+  measureFrom: {
+    kind: "choice",
+    default: "box",
+    choices: ["box", "capitals"],
+    description: "Where a gap runs from: one box's foot to the next one's top, or one block's last baseline to the next one's first capitals (ADR 0230 decision 2)."
+  }
+};
+function stackItemOf(entry) {
+  return "item" in entry ? { block: entry.item, gap: entry.gapAbove } : { block: entry };
+}
+function stackIn(area, items, given = {}, options = {}) {
+  const values = parameterValues(STACK_PARAMETERS, given);
+  const entries = items.map(stackItemOf);
+  const blocks = entries.map((entry) => entry.block);
+  const widest = blocks.reduce((most, item) => Math.max(most, item.width), 0);
+  const width = Number.isFinite(area.width) ? area.width : widest;
   let y = 0;
   const children = [];
-  for (const item of options.items) {
-    children.push(shifted(item.draft, offsetFor(align, width, item.width), y));
-    y += item.height + gap;
+  const tops = [];
+  for (const [index, entry] of entries.entries()) {
+    const above = blocks[index - 1];
+    if (above !== void 0) {
+      const gap = entry.gap ?? values.gap;
+      y = values.measureFrom === "capitals" ? tops[index - 1] + anchorOf(above).baseline + gap - anchorOf(entry.block).capTop : y + (above.height + gap);
+    }
+    children.push(shifted(entry.block.draft, offsetFor(values.align, width, entry.block.width), y));
+    tops.push(y);
   }
-  const height = options.items.length === 0 ? 0 : y - gap;
-  return { width, height, draft: groupOf(children, options.name) };
+  const last = blocks[blocks.length - 1];
+  const height = last === void 0 ? 0 : values.measureFrom === "capitals" ? y + last.height : y + (last.height + values.gap) - values.gap;
+  return {
+    width,
+    height,
+    draft: groupOf(children, options.name),
+    ...anchorAcross(blocks, tops),
+    overflow: overrun(height, area.height)
+  };
 }
 function at(x, y, item) {
   return shifted(item.draft, x, y);
 }
 function groupOf(children, name) {
   return group({ children, ...name === void 0 ? {} : { name } });
+}
+var DEFAULT_METRICS = { ascent: 0.75, descent: 0.25, capHeight: 0.709 };
+function capOffset(size, lineHeight, metrics = DEFAULT_METRICS) {
+  const excess = (lineHeight - (metrics.ascent + metrics.descent)) / 2;
+  return size * (excess + (metrics.ascent - metrics.capHeight));
+}
+var FIELD_SEPARATOR = "|";
+function rowGroups(text5, fieldCount, grouped, headingFields = 1) {
+  const result = [];
+  for (const line of lines(text5)) {
+    if (grouped && fields(line).length === headingFields) {
+      const [heading = [], ...headingRest] = headingFields === 1 ? [line] : fields(line, headingFields);
+      result.push({ heading, headingRest, rows: [] });
+      continue;
+    }
+    if (result.length === 0) result.push({ heading: [], headingRest: [], rows: [] });
+    result[result.length - 1].rows.push(fields(line, fieldCount));
+  }
+  return result;
+}
+function lines(text5) {
+  const result = [];
+  let current = [];
+  for (const inline of text5) {
+    if (inline.kind === "break") {
+      result.push(current);
+      current = [];
+      continue;
+    }
+    current.push(inline);
+  }
+  result.push(current);
+  return result.filter((line) => plain(line).trim() !== "");
+}
+function fields(line, limit) {
+  const result = [[]];
+  const last = () => result[result.length - 1];
+  for (const inline of line) {
+    if (inline.kind !== "text" || limit !== void 0 && result.length >= limit) {
+      last().push(inline);
+      continue;
+    }
+    const parts = inline.value.split(FIELD_SEPARATOR);
+    for (const [index, part] of parts.entries()) {
+      if (index > 0) {
+        if (limit !== void 0 && result.length >= limit) {
+          last().push(sliceOf(inline, `${FIELD_SEPARATOR}${part}`, inline.value));
+          continue;
+        }
+        result.push([]);
+      }
+      if (part !== "") last().push(sliceOf(inline, part, inline.value));
+    }
+  }
+  return result.map(trimEnds);
+}
+function plain(text5) {
+  return text5.map((inline) => {
+    switch (inline.kind) {
+      case "text":
+        return inline.value;
+      case "break":
+        return "\n";
+      default:
+        return plain(inline.children);
+    }
+  }).join("");
+}
+function sliceOf(inline, part, whole) {
+  const offset = whole.indexOf(part);
+  const start = Math.min(inline.range.start + Math.max(offset, 0), inline.range.end);
+  return {
+    kind: "text",
+    value: part,
+    range: { start, end: Math.min(start + part.length, inline.range.end) }
+  };
+}
+function trimEnds(field) {
+  const trimmed3 = [...field];
+  const first = trimmed3[0];
+  if (first?.kind === "text") trimmed3[0] = { ...first, value: first.value.replace(/^\s+/u, "") };
+  const lastIndex = trimmed3.length - 1;
+  const final = trimmed3[lastIndex];
+  if (final?.kind === "text") {
+    trimmed3[lastIndex] = { ...final, value: final.value.replace(/\s+$/u, "") };
+  }
+  return trimmed3.filter((inline) => inline.kind !== "text" || inline.value !== "");
 }
 var NUMBER = String.raw`\d[\d.,]*`;
 var UNITS = [
@@ -22546,101 +22734,37 @@ var LABEL_EXCEPTIONS = [
   { name: "a time", pattern: String.raw`\d{1,2}:\d{2}` },
   { name: "a URL", pattern: String.raw`\p{L}[\p{L}\d+.-]*://\S*` }
 ];
-function mark(shape, height, fill, name) {
-  const scale = height / shape.box.h;
-  return block(
-    shape.box.w * scale,
-    height,
-    vector({
-      name,
-      geometry: { kind: "path", d: shape.d, fillRule: shape.fillRule },
-      size: shape.box,
-      fill: solid(fill),
-      transform: { scaleX: scale, scaleY: scale }
-    })
-  );
+function mark(shape2, height, fill, name) {
+  const drawn = markIn(shape2, { width: Infinity, height }, fill, {}, { name });
+  return { width: drawn.width, height: drawn.height, draft: drawn.draft };
 }
-var FIELD_SEPARATOR = "|";
-function rowGroups(text2, fieldCount, grouped, headingFields = 1) {
-  const result = [];
-  for (const line of lines(text2)) {
-    if (grouped && fields(line).length === headingFields) {
-      const [heading = [], ...headingRest] = headingFields === 1 ? [line] : fields(line, headingFields);
-      result.push({ heading, headingRest, rows: [] });
-      continue;
-    }
-    if (result.length === 0) result.push({ heading: [], headingRest: [], rows: [] });
-    result[result.length - 1].rows.push(fields(line, fieldCount));
+var MARK_PARAMETERS = {
+  height: {
+    kind: "length",
+    default: 24,
+    min: 0,
+    description: "The mark's height, in px; absent, the area's height when it has one."
   }
-  return result;
-}
-function lines(text2) {
-  const result = [];
-  let current = [];
-  for (const inline of text2) {
-    if (inline.kind === "break") {
-      result.push(current);
-      current = [];
-      continue;
-    }
-    current.push(inline);
-  }
-  result.push(current);
-  return result.filter((line) => plain(line).trim() !== "");
-}
-function fields(line, limit) {
-  const result = [[]];
-  const last = () => result[result.length - 1];
-  for (const inline of line) {
-    if (inline.kind !== "text" || limit !== void 0 && result.length >= limit) {
-      last().push(inline);
-      continue;
-    }
-    const parts = inline.value.split(FIELD_SEPARATOR);
-    for (const [index, part] of parts.entries()) {
-      if (index > 0) {
-        if (limit !== void 0 && result.length >= limit) {
-          last().push(sliceOf(inline, `${FIELD_SEPARATOR}${part}`, inline.value));
-          continue;
-        }
-        result.push([]);
-      }
-      if (part !== "") last().push(sliceOf(inline, part, inline.value));
-    }
-  }
-  return result.map(trimEnds);
-}
-function plain(text2) {
-  return text2.map((inline) => {
-    switch (inline.kind) {
-      case "text":
-        return inline.value;
-      case "break":
-        return "\n";
-      default:
-        return plain(inline.children);
-    }
-  }).join("");
-}
-function sliceOf(inline, part, whole) {
-  const offset = whole.indexOf(part);
-  const start = Math.min(inline.range.start + Math.max(offset, 0), inline.range.end);
+};
+function markIn(shape2, area, fill, given = {}, options = {}) {
+  const values = parameterValues(MARK_PARAMETERS, given);
+  const height = given.height !== void 0 || !Number.isFinite(area.height) ? values.height : area.height;
+  const scale = height / shape2.box.h;
+  const width = shape2.box.w * scale;
   return {
-    kind: "text",
-    value: part,
-    range: { start, end: Math.min(start + part.length, inline.range.end) }
+    ...block(
+      width,
+      height,
+      vector({
+        name: options.name ?? "mark",
+        geometry: { kind: "path", d: shape2.d, fillRule: shape2.fillRule },
+        size: shape2.box,
+        fill: solid(fill),
+        transform: { scaleX: scale, scaleY: scale }
+      })
+    ),
+    overflow: Number.isFinite(area.width) ? Math.max(0, width - area.width) : 0
   };
-}
-function trimEnds(field) {
-  const trimmed2 = [...field];
-  const first = trimmed2[0];
-  if (first?.kind === "text") trimmed2[0] = { ...first, value: first.value.replace(/^\s+/u, "") };
-  const lastIndex = trimmed2.length - 1;
-  const final = trimmed2[lastIndex];
-  if (final?.kind === "text") {
-    trimmed2[lastIndex] = { ...final, value: final.value.replace(/\s+$/u, "") };
-  }
-  return trimmed2.filter((inline) => inline.kind !== "text" || inline.value !== "");
 }
 function atLeastOne(runs) {
   const [first, ...rest] = runs;
@@ -22659,23 +22783,131 @@ function nothing(width, height) {
   return block(width, height, group({ children: [] }));
 }
 function textBlock(value, size, style2, options = {}) {
-  const runs = runsIn(value, style2);
-  if (runs === void 0) return nothing(size.w, size.h);
-  return block(size.w, size.h, text({ ...options, runs, box: { w: size.w, h: size.h } }));
+  const { given, rest } = splitOptions(options);
+  return withoutAnchor(
+    textIn(value, { width: size.w, height: size.h }, style2, given, { text: rest })
+  );
 }
 function grownTextBlock(value, width, minHeight, style2, measure, options = {}) {
-  const runs = runsIn(value, style2);
-  if (runs === void 0) return nothing(width, minHeight);
-  const measured = measure(text({ ...options, runs, box: { w: width } }));
-  if (measured === void 0) {
-    return block(
-      width,
-      minHeight,
-      text({ ...options, runs, box: { w: width, h: minHeight }, overflow: "shrink" })
-    );
+  const { given, rest } = splitOptions(options);
+  return withoutAnchor(
+    grownTextIn(
+      value,
+      { width, height: Infinity },
+      style2,
+      { ...given, minHeight },
+      { measure, text: rest }
+    )
+  );
+}
+var TEXT_PARAMETERS = {
+  lineHeight: {
+    kind: "ratio",
+    default: 1.2,
+    min: 0,
+    description: "From one line to the next, as a multiple of the size."
+  },
+  letterSpacing: { kind: "length", default: 0, description: "Space added between letters, in px." },
+  align: {
+    kind: "choice",
+    default: "left",
+    choices: ["left", "center", "right", "justify"],
+    description: "Where each line sits across the box."
+  },
+  valign: {
+    kind: "choice",
+    default: "top",
+    choices: ["top", "middle", "bottom"],
+    description: "Where the lines sit down the box."
+  },
+  overflow: {
+    kind: "choice",
+    default: "clip",
+    choices: ["clip", "shrink", "grow"],
+    description: "What the text does when it does not fit its box."
   }
-  const height = Math.max(minHeight, measured.height);
-  return block(width, height, text({ ...options, runs, box: { w: width, h: height } }));
+};
+var GROWN_TEXT_PARAMETERS = {
+  ...TEXT_PARAMETERS,
+  minHeight: {
+    kind: "length",
+    default: 0,
+    min: 0,
+    description: "The least height the block takes, in px, however few its lines."
+  }
+};
+function textIn(value, area, style2, given = {}, options = {}) {
+  const values = parameterValues(TEXT_PARAMETERS, given);
+  const runs = runsIn(value, style2);
+  const bounded = Number.isFinite(area.height);
+  if (runs === void 0) return { ...nothing(area.width, bounded ? area.height : 0), overflow: 0 };
+  const draft = text({
+    ...options.text,
+    runs,
+    box: bounded ? { w: area.width, h: area.height } : { w: area.width },
+    ...values
+  });
+  const laid = linesOf(draft, runs, options.measure);
+  const tall = laid.lines * values.lineHeight * style2.size;
+  const height = bounded ? area.height : laid.height ?? tall;
+  return {
+    width: area.width,
+    height,
+    draft,
+    anchor: anchorIn(height, laid.lines, style2.size, values, options.metrics),
+    overflow: bounded ? Math.max(0, (laid.height ?? tall) - area.height) : 0
+  };
+}
+function grownTextIn(value, area, style2, given = {}, options = {}) {
+  const { minHeight, ...values } = parameterValues(GROWN_TEXT_PARAMETERS, given);
+  const width = area.width;
+  const runs = runsIn(value, style2);
+  if (runs === void 0) return { ...nothing(width, minHeight), overflow: 0 };
+  const node2 = (box, overflow = values.overflow) => text({ ...options.text, runs, box, ...values, overflow });
+  const measured = (options.measure ?? (() => void 0))(node2({ w: width }));
+  const finished = measured === void 0 ? { height: minHeight, draft: node2({ w: width, h: minHeight }, "shrink") } : (() => {
+    const height = Math.max(minHeight, measured.height);
+    return { height, draft: node2({ w: width, h: height }) };
+  })();
+  const lines2 = measured?.lines ?? linesWritten2(runs);
+  return {
+    width,
+    height: finished.height,
+    draft: finished.draft,
+    anchor: anchorIn(finished.height, lines2, style2.size, values, options.metrics),
+    overflow: Number.isFinite(area.height) ? Math.max(0, finished.height - area.height) : 0
+  };
+}
+function linesOf(draft, runs, measure) {
+  const probe = draft.box.h === void 0 ? draft : { ...draft, box: { w: draft.box.w } };
+  const measured = measure?.(probe);
+  return measured === void 0 ? { lines: linesWritten2(runs) } : { lines: measured.lines, height: measured.height };
+}
+function linesWritten2(runs) {
+  return runs.filter((each) => each.kind === "break").length + 1;
+}
+function anchorIn(boxHeight, lines2, size, values, metrics = DEFAULT_METRICS) {
+  const pitch = size * values.lineHeight;
+  const room = boxHeight - lines2 * pitch;
+  const top = values.valign === "middle" ? room / 2 : values.valign === "bottom" ? room : 0;
+  const capTop = top + capOffset(size, values.lineHeight, metrics);
+  return { capTop, baseline: capTop + (lines2 - 1) * pitch + size * metrics.capHeight };
+}
+function splitOptions(options) {
+  const { lineHeight, letterSpacing, align, valign, overflow, ...rest } = options;
+  return {
+    given: {
+      ...lineHeight === void 0 ? {} : { lineHeight },
+      ...letterSpacing === void 0 ? {} : { letterSpacing },
+      ...align === void 0 ? {} : { align },
+      ...valign === void 0 ? {} : { valign },
+      ...overflow === void 0 ? {} : { overflow }
+    },
+    rest
+  };
+}
+function withoutAnchor(item) {
+  return { width: item.width, height: item.height, draft: item.draft };
 }
 function naturalWidth(value, style2, measure) {
   const runs = runsIn(value, style2);
@@ -22697,8 +22929,221 @@ function reportOverflow(report, bottom, limit) {
   const overflow = bottom - limit;
   if (overflow > 0) report({ code: "W_TEMPLATE_OVERFLOW", overflow });
 }
+var FIT_TEXT_PARAMETERS = {
+  floor: { kind: "length", default: 24, min: 1, description: "The smallest size, in px." },
+  ceiling: { kind: "length", default: 48, min: 1, description: "The largest size, in px." },
+  step: {
+    kind: "length",
+    default: 1,
+    min: 0,
+    description: "From one size tried to the next, in px. 0 is continuous: `oneLine` solves for the size that makes the line exactly as wide as the area."
+  },
+  start: {
+    kind: "choice",
+    default: "ceiling",
+    choices: ["ceiling", "whole"],
+    description: "The first size tried: the ceiling itself, or the whole pixel at or under it."
+  },
+  floorLast: {
+    kind: "choice",
+    default: "always",
+    choices: ["always", "on-step"],
+    description: "Whether the floor is tried last even when the step misses it, or only if hit."
+  },
+  lineHeight: {
+    kind: "ratio",
+    default: 1.2,
+    min: 0.5,
+    description: "From one line to the next, as a multiple of the size."
+  },
+  lineCap: {
+    kind: "length",
+    default: 0,
+    min: 0,
+    description: "The most lines a fitting size may take; 0 is no cap."
+  },
+  keepWrittenLines: {
+    kind: "choice",
+    default: "no",
+    choices: ["first", "no"],
+    description: "`first`: look for a size that keeps the lines as written before one that wraps them."
+  },
+  widthTolerance: {
+    kind: "length",
+    default: 0.5,
+    min: 0,
+    description: "Px a line may run past the area and still fit, for the rounding of a measure."
+  },
+  measureFrom: {
+    kind: "choice",
+    default: "box",
+    choices: ["box", "capitals"],
+    description: "How tall the text is against the area: its line boxes, or from its first capitals to its last baseline (ADR 0230)."
+  },
+  estimatedAdvance: {
+    kind: "ratio",
+    default: 0.55,
+    min: 0,
+    description: "A character's advance, in em, when nothing can measure the text."
+  },
+  align: {
+    kind: "choice",
+    default: "left",
+    choices: ["left", "center", "right"],
+    description: "Where each line sits across the area."
+  }
+};
+var ORPHAN_LIMITS = { shrink: 0.08, tracking: 0.01 };
+var FITTED_COLUMN_PARAMETERS = {
+  floor: FIT_TEXT_PARAMETERS.floor,
+  ceiling: FIT_TEXT_PARAMETERS.ceiling,
+  step: FIT_TEXT_PARAMETERS.step,
+  start: FIT_TEXT_PARAMETERS.start,
+  floorLast: FIT_TEXT_PARAMETERS.floorLast,
+  gapFloor: {
+    kind: "length",
+    default: 24,
+    min: 0,
+    description: "The least a gap's unit may be, in px: a gap of weight w is at least w \xD7 this."
+  },
+  orphanShrink: {
+    kind: "ratio",
+    default: ORPHAN_LIMITS.shrink,
+    min: 0,
+    description: "How far under its fitted size the text may go to keep a word off a line alone."
+  },
+  orphanTracking: {
+    kind: "length",
+    default: ORPHAN_LIMITS.tracking,
+    min: 0,
+    description: "The most letter spacing, in em, a text may take or give for the same."
+  }
+};
+var PICTURE_SHAPE_PARAMETERS = {
+  widest: {
+    kind: "ratio",
+    default: 3,
+    min: 0,
+    description: "The widest shape the picture may take, as width over height."
+  },
+  tallest: {
+    kind: "ratio",
+    default: 1,
+    min: 0,
+    description: "The tallest shape the picture may take, as width over height; a taller file is fitted whole."
+  },
+  fallback: {
+    kind: "ratio",
+    default: 2,
+    min: 0,
+    description: "The picture's shape, as width over height, when the file's size is unknown."
+  },
+  fit: {
+    kind: "choice",
+    default: "auto",
+    choices: ["auto", "cover", "contain"],
+    description: "How the file fills the picture: `auto` covers it when the picture took the file\u2019s own shape and fits it whole otherwise."
+  }
+};
+var FRAMED_PICTURE_PARAMETERS = {
+  ...PICTURE_SHAPE_PARAMETERS,
+  border: {
+    kind: "length",
+    default: 4,
+    min: 0,
+    description: "The border on the top, the right and the foot, in px."
+  },
+  side: {
+    kind: "length",
+    default: 29,
+    min: 0,
+    description: "The bar down the left side, border included, in px."
+  },
+  radius: {
+    kind: "length",
+    default: 32,
+    min: 0,
+    description: "The inside's two left corners, where it meets the bar, in px."
+  },
+  shadowX: { kind: "length", default: 17, description: "The shadow's offset to the right, in px." },
+  shadowY: { kind: "length", default: 47, description: "The shadow's offset down, in px." },
+  shadowBlur: {
+    kind: "length",
+    default: 12,
+    min: 0,
+    description: "The shadow's blur, a standard deviation in px."
+  },
+  shadowSpread: {
+    kind: "length",
+    default: -20,
+    description: "How much wider than the frame the shadow is on every side; below 0, narrower."
+  }
+};
 var NO_PADDING = { top: 0, bottom: 0, left: 0, right: 0 };
 function table(style2, rows, width) {
+  const drawn = tableIn({ width, height: Infinity }, style2, rows);
+  return { width: drawn.width, height: drawn.height, draft: drawn.draft };
+}
+var TABLE_PARAMETERS = {
+  columnGap: {
+    kind: "length",
+    default: 0,
+    description: "Space between cells, in px; side by side only."
+  },
+  rowGap: { kind: "length", default: 0, description: "Space between rows, in px." },
+  minRowHeight: {
+    kind: "length",
+    default: 0,
+    min: 0,
+    description: "The least height a row takes, in px, however short its content."
+  },
+  layering: {
+    kind: "choice",
+    default: "side-by-side",
+    choices: ["side-by-side", "overlap"],
+    description: "Cells in slots of their own, or each shape from the row\u2019s left edge, laid over the next."
+  },
+  cornerRadius: {
+    kind: "length",
+    default: 0,
+    min: 0,
+    description: "The cells' corner radius, in px; 0 is square."
+  },
+  cornersAt: {
+    kind: "choice",
+    default: "every-cell",
+    choices: ["every-cell", "outer"],
+    description: "Every cell rounded, or only the table\u2019s four outer corners."
+  }
+};
+function tableStyleWith(style2, given) {
+  if (Object.keys(given).length === 0) return style2;
+  const values = parameterValues(TABLE_PARAMETERS, {
+    ...style2.columnGap === void 0 ? {} : { columnGap: style2.columnGap },
+    rowGap: style2.rowGap,
+    minRowHeight: style2.minRowHeight,
+    ...style2.layering === void 0 ? {} : { layering: style2.layering },
+    ...style2.corners === void 0 ? {} : { cornerRadius: style2.corners.radius, cornersAt: style2.corners.at },
+    ...given
+  });
+  const rounded = given.cornerRadius !== void 0 || given.cornersAt !== void 0 || style2.corners !== void 0;
+  return {
+    ...style2,
+    columnGap: values.columnGap,
+    rowGap: values.rowGap,
+    minRowHeight: values.minRowHeight,
+    layering: values.layering,
+    ...rounded ? { corners: { radius: values.cornerRadius, at: values.cornersAt } } : {}
+  };
+}
+function tableIn(area, style2, rows, given = {}) {
+  const drawn = drawTable(tableStyleWith(style2, given), rows, area.width);
+  return {
+    ...drawn,
+    overflow: Number.isFinite(area.height) ? Math.max(0, drawn.height - area.height) : 0
+  };
+}
+function drawTable(style2, rows, width) {
   const placed = placeColumns(style2, rows, width);
   const seen = /* @__PURE__ */ new Map();
   const drawn = rows.map((row2, index) => {
@@ -22892,6 +23337,66 @@ function rewritten(value, rewrite) {
   return rewrite === void 0 || value.length === 0 ? value : rewrite(value);
 }
 function slotTable(style2, content) {
+  const drawn = slotTableIn({ width: content.width, height: Infinity }, style2, content);
+  return { width: drawn.width, height: drawn.height, draft: drawn.draft };
+}
+var SLOT_TABLE_PARAMETERS = {
+  columnGap: {
+    kind: "length",
+    default: 0,
+    description: "Space between cells, in px; side by side only."
+  },
+  rowGap: { kind: "length", default: 0, description: "Space between rows, in px." },
+  minRowHeight: {
+    kind: "length",
+    default: 0,
+    min: 0,
+    description: "The least height a row takes, in px, however short its words."
+  },
+  layering: {
+    kind: "choice",
+    default: "side-by-side",
+    choices: ["side-by-side", "overlap"],
+    description: "Cells in slots of their own, or each shape from the row\u2019s left edge, laid over the next."
+  },
+  fitMax: {
+    kind: "length",
+    default: 0,
+    min: 0,
+    description: "The widest the rows may grow to fit their words, in px; 0 is the whole width."
+  }
+};
+function slotTableStyleWith(style2, given) {
+  if (Object.keys(given).length === 0) return style2;
+  const values = parameterValues(SLOT_TABLE_PARAMETERS, {
+    ...style2.columnGap === void 0 ? {} : { columnGap: style2.columnGap },
+    rowGap: style2.rowGap,
+    minRowHeight: style2.minRowHeight,
+    layering: style2.layering,
+    ...style2.fit === void 0 ? {} : { fitMax: style2.fit.max },
+    ...given
+  });
+  const { fit: _fit, ...rest } = style2;
+  return {
+    ...rest,
+    columnGap: values.columnGap,
+    rowGap: values.rowGap,
+    minRowHeight: values.minRowHeight,
+    layering: values.layering,
+    ...values.fitMax > 0 ? { fit: { max: values.fitMax } } : {}
+  };
+}
+function slotTableIn(area, style2, content, given = {}) {
+  const drawn = drawSlotTable(slotTableStyleWith(style2, given), {
+    ...content,
+    width: area.width
+  });
+  return {
+    ...drawn,
+    overflow: Number.isFinite(area.height) ? Math.max(0, drawn.height - area.height) : 0
+  };
+}
+function drawSlotTable(style2, content) {
   const fieldCount = style2.columns.reduce((sum, column) => sum + fieldsOf(column), 0);
   const caption = style2.groups?.caption;
   const groups = rowGroups(
@@ -23043,7 +23548,7 @@ function cellsOf(style2, fields2, measure) {
     const count = fieldsOf(column);
     const own2 = Array.from({ length: count }, (_, index) => fields2[next + index] ?? []);
     next += count;
-    return column.kind === "lines" ? { draw: (width) => linesOf2(column, width, own2, measure) } : labelCell(column, own2[0] ?? []);
+    return column.kind === "lines" ? { draw: (width) => linesOf3(column, width, own2, measure) } : labelCell(column, own2[0] ?? []);
   });
 }
 function labelCell(column, value) {
@@ -23061,7 +23566,7 @@ function labelCell(column, value) {
     )
   };
 }
-function linesOf2(column, inner, fields2, measure) {
+function linesOf3(column, inner, fields2, measure) {
   return stack({
     gap: column.lineGap,
     items: column.lines.map(
@@ -23082,20 +23587,47 @@ function shift2(draft, dx, dy) {
   if (dx === 0 && dy === 0) return draft;
   return at(dx, dy, block(0, 0, draft));
 }
+function piecesOf2(button) {
+  const boxless = button.style.trailing === void 0 ? button.trailing : void 0;
+  return [button.leading, button.words, boxless].filter(
+    (piece) => piece !== void 0
+  );
+}
 function buttonWidth(button) {
   const { style: style2 } = button;
-  const leading = button.leading === void 0 ? 0 : button.leading.width + style2.gap;
+  const pieces = piecesOf2(button);
+  const inner = pieces.reduce((sum, piece) => sum + piece.width, 0) + style2.gap * Math.max(0, pieces.length - 1);
   const trailing = style2.trailing?.width ?? 0;
-  return style2.padding.left + leading + button.words.width + style2.padding.right + trailing;
+  return style2.padding.left + inner + style2.padding.right + trailing;
 }
 function buttonRow(buttons, options) {
+  const drawn = buttonRowIn(
+    { width: options.width ?? Infinity, height: Infinity },
+    buttons,
+    { gap: options.gap, ...options.arrange === void 0 ? {} : { arrange: options.arrange } },
+    { ...options.name === void 0 ? {} : { name: options.name } }
+  );
+  if (options.report !== void 0) reportOverflow(options.report, drawn.overflow, 0);
+  return { width: drawn.width, height: drawn.height, draft: drawn.draft };
+}
+var BUTTON_ROW_PARAMETERS = {
+  gap: { kind: "length", default: 0, description: "Between two buttons, at least, in px." },
+  arrange: {
+    kind: "choice",
+    default: "packed",
+    choices: ["packed", "justified"],
+    description: "With room to spare: centred at `gap` apart, or spread so the first and last touch its edges."
+  }
+};
+function buttonRowIn(area, buttons, given = {}, options = {}) {
+  const values = parameterValues(BUTTON_ROW_PARAMETERS, given);
   const widths = buttons.map(buttonWidth);
-  const natural = widths.reduce((sum, each) => sum + each, 0) + options.gap * Math.max(0, buttons.length - 1);
-  const room = options.width ?? natural;
-  if (options.report !== void 0) reportOverflow(options.report, natural, room);
+  const natural = widths.reduce((sum, each) => sum + each, 0) + values.gap * Math.max(0, buttons.length - 1);
+  const room = Number.isFinite(area.width) ? area.width : natural;
+  const overflow = natural - room > 0 ? natural - room : 0;
   const spare = Math.max(0, room - natural);
-  const justified = options.arrange === "justified" && buttons.length > 1;
-  const gap = justified ? options.gap + spare / (buttons.length - 1) : options.gap;
+  const justified = values.arrange === "justified" && buttons.length > 1;
+  const gap = justified ? values.gap + spare / (buttons.length - 1) : values.gap;
   const height = buttons.reduce((tallest, each) => Math.max(tallest, each.style.height), 0);
   let x = justified ? 0 : spare / 2;
   const children = buttons.map((button, index) => {
@@ -23104,11 +23636,10 @@ function buttonRow(buttons, options) {
     x += drawn.width + gap;
     return placed;
   });
-  return block(
-    Math.max(room, natural),
-    height,
-    group({ name: options.name ?? "buttons", children })
-  );
+  return {
+    ...block(Math.max(room, natural), height, group({ name: options.name ?? "buttons", children })),
+    overflow
+  };
 }
 function drawButton(button, width) {
   const { style: style2 } = button;
@@ -23152,16 +23683,15 @@ function drawButton(button, width) {
     );
   }
   let x = style2.padding.left;
-  if (button.leading !== void 0) {
-    children.push(at(x, middle(button.leading), button.leading));
-    x += button.leading.width + style2.gap;
+  for (const piece of piecesOf2(button)) {
+    children.push(at(x, middle(piece), piece));
+    x += piece.width + style2.gap;
   }
-  children.push(at(x, middle(button.words), button.words));
   return block(width, h, group({ name: button.name ?? "button", children }));
 }
 var NO_FILL = solid({ r: 0, g: 0, b: 0, a: 0 });
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-KTMH3XT2.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.4/node_modules/@rafaelsilvalor/tyto-house-style/dist/chunk-KTMH3XT2.js
 var PLACEHOLDER_LOGO = {
   box: { w: 186.09, h: 376.79 },
   d: (
@@ -23209,7 +23739,7 @@ function signatureOf(kit) {
   return kit.signature ?? PLACEHOLDER_SIGNATURE;
 }
 
-// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.0/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
+// node_modules/.pnpm/@rafaelsilvalor+tyto-house-style@0.9.4/node_modules/@rafaelsilvalor/tyto-house-style/dist/index.js
 var PAPER2 = "#ffffff";
 var TITLE_INK = "#7c7c7c";
 var ROW2 = "#e7e7e7";
@@ -23331,8 +23861,7 @@ function callToComment(words, accent, width, measure) {
           overflow: "shrink"
         })
       },
-      // The balloon sits in `words` until the kit's buttons can hold an icon alone (TYTO-884).
-      { name: "cta-balloon", style: bare, words: mark(BALLOON, CTA.balloon, accent, "balloon") }
+      { name: "cta-balloon", style: bare, leading: mark(BALLOON, CTA.balloon, accent, "balloon") }
     ],
     { gap: CTA.balloonGap, name: "call-to-comment" }
   );
